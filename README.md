@@ -83,7 +83,8 @@ curl -fsSL https://raw.githubusercontent.com/TOBYCAI/otp-board/main/server/insta
 ```
 
 - 脚本**自包含**：`server.js`、`shared/js/otp-core.js`、`package.json` 全部内嵌其中，运行时不依赖 GitHub、不联网拉取任何东西，下载这一个文件就能跑。
-- 自动完成：检测 Node.js ≥ 18 → 随机生成 `INGEST_TOKEN` / `ADMIN_TOKEN` 写入 `.env` → 用 pm2（无 pm2 时回退 nohup）启动服务。
+- **交互式向导**：在终端里直接运行 `bash install.sh` 时，会逐项询问安装目录、HTTP 端口、推送 Token、管理 Token、验证码保留天数、限流与开机自启方式，最后打印配置让你确认（y/n）后再安装——还原了原版 `otp31.sh` 的引导式体验。
+- **非终端自动跳过**：通过 `curl | bash` 管道运行时无交互，自动采用默认值并随机生成 `INGEST_TOKEN` / `ADMIN_TOKEN`，仍可一键无人值守部署。
 - 可选第一个参数指定目录：`bash install.sh /opt/otp-board`（默认装到 `~/otp-board-server`）。
 - 看板启动后访问 `http://<host>:3000/`（生产建议用 Nginx/Caddy 做 HTTPS 反代，见 `server/deploy/`）。
 

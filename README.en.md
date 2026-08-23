@@ -84,7 +84,9 @@ curl -fsSL https://raw.githubusercontent.com/TOBYCAI/otp-board/main/server/insta
 ```
 
 - The script is **self-contained**: `server.js`, `shared/js/otp-core.js` and `package.json` are embedded in it — no runtime GitHub fetch, no network dependency. Just download this one file and run.
-- It will: check Node.js ≥ 18 → generate random `INGEST_TOKEN` / `ADMIN_TOKEN` into `.env` → start the service via pm2 (or nohup fallback). Pass a directory as the first argument (`bash install.sh /opt/otp-board`; default: `~/otp-board-server`).
+- **Interactive wizard**: when you run `bash install.sh` directly in a terminal, it asks step by step for install dir, HTTP port, ingest token, admin token, retention days, rate limit and auto-start method, then prints a summary for you to confirm (y/n) before installing — mirroring the original `otp31.sh` guided experience.
+- **Non-interactive fallback**: when piped (`curl | bash`) there is no prompt — it uses safe defaults and auto-generates `INGEST_TOKEN` / `ADMIN_TOKEN`, so unattended one-click deploy still works.
+- Pass a directory as the first argument (`bash install.sh /opt/otp-board`; default: `~/otp-board-server`).
 - Dashboard: `http://<host>:3000/` (use Nginx/Caddy for TLS in production, see `server/deploy/`).
 
 **Option 2: Download the Release source zip and run it (audit / hack on it)**

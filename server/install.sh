@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# OTP Board — self-contained one-click server installer.
+# OTP Board — self-contained one-click server installer with interactive wizard.
 #
 #   curl -fsSL https://raw.githubusercontent.com/TOBYCAI/otp-board/main/server/install.sh | bash
 #
@@ -7,12 +7,46 @@
 # so this single file is enough — no runtime fetch from GitHub required.
 # After running it, the dashboard is live on http://<host>:3000/.
 #
+# Interactive: when run in a terminal it asks for install dir / port / tokens /
+# retention / rate-limit / auto-start and shows a confirmation step (mirrors the
+# original otp31.sh guided install). When piped (curl | bash) it falls back to
+# safe defaults and auto-generates tokens, so it still runs unattended.
+#
 # Override the install dir:  install.sh /opt/otp-board
 set -euo pipefail
 
 INSTALL_DIR="${1:-$HOME/otp-board-server}"
 
+# Interactive mode only when attached to a real terminal (not piped / curl | bash).
+# When non-interactive, every prompt falls back to a safe default and the final
+# confirmation is auto-accepted, so `curl ... | bash` still works unattended.
+INTERACTIVE=0
+if [ -t 0 ]; then
+  INTERACTIVE=1
+fi
+
+# Helper: ask a question. Usage: ask VAR "prompt" "default"
+# In non-interactive mode the default is taken without prompting.
+ask() {
+  local __var="$1" __prompt="$2" __default="$3"
+  if [ "${INTERACTIVE}" -eq 1 ]; then
+    local __ans
+    if [ -n "${__default}" ]; then
+      read -r -p "${__prompt} (默认 ${__default}): " __ans
+    else
+      read -r -p "${__prompt}: " __ans
+    fi
+    __ans="${__ans:-${__default}}"
+    printf -v "$__var" '%s' "$__ans"
+  else
+    printf -v "$__var" '%s' "$__default"
+  fi
+}
+
 echo "== OTP Board one-click installer (self-contained) =="
+if [ "${INTERACTIVE}" -eq 1 ]; then
+  echo "  交互式安装向导（非终端环境将自动使用默认值）"
+fi
 echo "Install dir : ${INSTALL_DIR}"
 
 # --- 1. Node check ---
@@ -28,11 +62,8 @@ if [ "${NODE_MAJOR:-0}" -lt 18 ]; then
 fi
 echo "Node        : $(node -v) (${NODE_BIN})"
 
-# --- 2. Prepare dirs (repo layout: server/ + shared/) ---
-mkdir -p "${INSTALL_DIR}/server" "${INSTALL_DIR}/shared/js"
-cd "${INSTALL_DIR}"
-
-# --- 3. Write embedded files ---
+# --- 2. Write embedded files ---
+# (dirs are prepared + cd'd after the wizard resolves INSTALL_DIR, see step 3.5)
 echo ""
 echo "== Writing files =="
 cat > server/server.js <<'___SERVERJS___'
@@ -782,34 +813,157 @@ cat > server/package.json <<'___PKG___'
 
 ___PKG___
 
-# --- 4. .env with auto tokens ---
+# --- 3.5 Interactive wizard (or defaults when non-interactive) ---
+# Ask the user for the runtime config. Mirrors the original otp31.sh guided install.
+echo ""
+echo "============================================"
+echo "  OTP Board 服务端配置向导"
+echo "============================================"
+
+ask INSTALL_DIR "安装目录" "${INSTALL_DIR}"
+mkdir -p "${INSTALL_DIR}/server" "${INSTALL_DIR}/shared/js"
+cd "${INSTALL_DIR}"
+
+ask PORT "HTTP 监听端口" "3000"
+ask BIND "绑定地址（0.0.0.0=所有网卡 / 127.0.0.1=仅本机）" "0.0.0.0"
+ask INGEST_TOKEN "推送接口 Token（留空则随机生成；手机端转发需带此 Token，否则 403）" ""
+ask ADMIN_TOKEN "管理看板 Token（留空则随机生成；留空但想开放看板请输入 EMPTY）" ""
+ask RETENTION_DAYS "验证码保留天数（自动清理）" "14"
+ask RATE_LIMIT_PER_MIN "每分钟每 IP 最大推送次数（限流）" "30"
+
+echo ""
+echo "============================================"
+echo "  开机自启配置"
+echo "  1. 不配置开机自启（手动启动）"
+echo "  2. crontab @reboot（推荐，最简单可靠）"
+echo "  3. PM2 自带自启（需已安装 pm2）"
+echo "  4. systemd 服务"
+echo "============================================"
+ask AUTO_START "请选择开机自启方式 (1/2/3/4)" "3"
+
+# Confirmation step (skipped / auto-yes when non-interactive)
+if [ "${INTERACTIVE}" -eq 1 ]; then
+  echo ""
+  echo "============================================"
+  echo "  请确认以下信息："
+  echo "  安装目录:        ${INSTALL_DIR}"
+  echo "  监听端口:        ${PORT}"
+  echo "  绑定地址:        ${BIND}"
+  echo "  推送 Token:      ${INGEST_TOKEN:+${INGEST_TOKEN:0:6}******（已设置）}${INGEST_TOKEN:-<随机生成>}"
+  echo "  管理 Token:      ${ADMIN_TOKEN:+${ADMIN_TOKEN:0:6}******（已设置）}${ADMIN_TOKEN:-<随机生成>}"
+  echo "  保留天数:        ${RETENTION_DAYS} 天"
+  echo "  限流:            ${RATE_LIMIT_PER_MIN} 次/分钟"
+  case $AUTO_START in
+    1) echo "  开机自启:        不配置" ;;
+    2) echo "  开机自启:        crontab @reboot" ;;
+    3) echo "  开机自启:        PM2 自带自启" ;;
+    4) echo "  开机自启:        systemd 服务" ;;
+  esac
+  echo "============================================"
+  read -r -p "以上信息正确吗？(y/n，默认 y): " CONFIRM
+  CONFIRM="${CONFIRM:-y}"
+  if [ "$CONFIRM" != "y" ] && [ "$CONFIRM" != "Y" ]; then
+    echo "已取消部署。"
+    exit 1
+  fi
+fi
+
+# Resolve empty tokens: random gen, or explicit EMPTY -> open dashboard.
+if [ -z "${INGEST_TOKEN}" ]; then
+  INGEST_TOKEN="$(node -e "console.log(require('crypto').randomBytes(24).toString('hex'))")"
+fi
+if [ "${ADMIN_TOKEN}" = "EMPTY" ]; then
+  ADMIN_TOKEN=""
+fi
+if [ -z "${ADMIN_TOKEN}" ] && [ "${INTERACTIVE}" -eq 0 ]; then
+  # Non-interactive: keep a random admin token so the dashboard isn't wide open.
+  ADMIN_TOKEN="$(node -e "console.log(require('crypto').randomBytes(24).toString('hex'))")"
+fi
+
+# --- 4. .env ---
 if [ ! -f server/.env ]; then
   cat > server/.env <<'___ENV___'
-PORT=3000
-BIND=0.0.0.0
+PORT=__PORT__
+BIND=__BIND__
 DATA_FILE=./data/messages.json
 INGEST_TOKEN=__INGEST_TOKEN__
 ADMIN_TOKEN=__ADMIN_TOKEN__
-RETENTION_DAYS=14
-RATE_LIMIT_PER_MIN=30
+RETENTION_DAYS=__RETENTION_DAYS__
+RATE_LIMIT_PER_MIN=__RATE_LIMIT_PER_MIN__
 TZ=Asia/Shanghai
 ___ENV___
-  ITOK="$(node -e "console.log(require('crypto').randomBytes(24).toString('hex'))")"
-  ATOK="$(node -e "console.log(require('crypto').randomBytes(24).toString('hex'))")"
-  sed -i.bak -E "s/__INGEST_TOKEN__/${ITOK}/" server/.env && rm -f server/.env.bak
-  sed -i.bak -E "s/__ADMIN_TOKEN__/${ATOK}/" server/.env && rm -f server/.env.bak
-  echo "  .env created with auto-generated INGEST_TOKEN / ADMIN_TOKEN."
+  sed -i.bak -E "s/__PORT__/${PORT}/" server/.env && rm -f server/.env.bak
+  sed -i.bak -E "s/__BIND__/${BIND}/" server/.env && rm -f server/.env.bak
+  sed -i.bak -E "s/__INGEST_TOKEN__/${INGEST_TOKEN}/" server/.env && rm -f server/.env.bak
+  sed -i.bak -E "s/__ADMIN_TOKEN__/${ADMIN_TOKEN}/" server/.env && rm -f server/.env.bak
+  sed -i.bak -E "s/__RETENTION_DAYS__/${RETENTION_DAYS}/" server/.env && rm -f server/.env.bak
+  sed -i.bak -E "s/__RATE_LIMIT_PER_MIN__/${RATE_LIMIT_PER_MIN}/" server/.env && rm -f server/.env.bak
+  echo "  .env created with your configuration."
   echo "  (edit server/.env to change PORT, TOKENS, retention, etc.)"
 fi
 
-# --- 5. Start service ---
+# --- 5. Optional auto-start ---
+setup_autostart() {
+  case "$AUTO_START" in
+    2)
+      if command -v crontab >/dev/null 2>&1; then
+        ( crontab -l 2>/dev/null | grep -v "otp-board" ; echo "@reboot cd ${INSTALL_DIR}/server && node server.js >> ${INSTALL_DIR}/server/otp-board.log 2>&1" ) | crontab -
+        echo "  已配置 crontab @reboot 开机自启。"
+      else
+        echo "  未找到 crontab，跳过开机自启（方式 2 不可用）。"
+      fi
+      ;;
+    3)
+      if command -v pm2 >/dev/null 2>&1; then
+        pm2 startup >/dev/null 2>&1 || true
+        echo "  已配置 PM2 开机自启（pm2 startup）。"
+      else
+        echo "  未安装 pm2，跳过开机自启（方式 3 不可用，可改用方式 2）。"
+      fi
+      ;;
+    4)
+      if command -v systemctl >/dev/null 2>&1; then
+        cat > /etc/systemd/system/otp-board.service <<EOF
+[Unit]
+Description=OTP Board server
+After=network.target
+
+[Service]
+WorkingDirectory=${INSTALL_DIR}/server
+ExecStart=$(command -v node) ${INSTALL_DIR}/server/server.js
+Restart=on-failure
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target
+EOF
+        systemctl daemon-reload >/dev/null 2>&1 || true
+        systemctl enable otp-board >/dev/null 2>&1 || true
+        echo "  已配置 systemd 服务 otp-board（enable）。"
+      else
+        echo "  未找到 systemctl，跳过开机自启（方式 4 不可用）。"
+      fi
+      ;;
+    *) echo "  不配置开机自启（手动启动）。" ;;
+  esac
+}
+setup_autostart
+
+# --- 6. Start service now (unless auto-start already handles it) ---
 echo ""
 echo "== Starting service =="
 cd server
 PORT="$(grep -E '^PORT=' .env | head -1 | cut -d= -f2- | tr -d '\r' || echo 3000)"
 PORT="${PORT:-3000}"
 
-if command -v pm2 >/dev/null 2>&1; then
+if [ "${AUTO_START}" = "4" ] && command -v systemctl >/dev/null 2>&1; then
+  systemctl start otp-board >/dev/null 2>&1 || true
+  echo "  started via systemd (systemctl start otp-board)."
+elif [ "${AUTO_START}" = "3" ] && command -v pm2 >/dev/null 2>&1; then
+  pm2 start server.js --name otp-board --update-env 2>/dev/null || pm2 start server.js --name otp-board
+  pm2 save 2>/dev/null || true
+  echo "  started via pm2 (name: otp-board)."
+elif command -v pm2 >/dev/null 2>&1; then
   pm2 start server.js --name otp-board --update-env 2>/dev/null || pm2 start server.js --name otp-board
   pm2 save 2>/dev/null || true
   echo "  started via pm2 (name: otp-board)."
