@@ -67,6 +67,17 @@ otp-board/
 
 ### 1. 服务端
 
+**一键安装（推荐，零配置）：**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/TOBYCAI/otp-board/main/server/install.sh | bash
+```
+
+该脚本会自动：检测 Node.js ≥ 18 → 拉取 `server/` + `shared/`（保持 `require('../shared/js/otp-core.js')` 可解析）→ 用随机值生成 `INGEST_TOKEN` / `ADMIN_TOKEN` → 用 pm2（无 pm2 时回退 nohup）启动服务。
+可用第一个参数指定安装目录，例如 `bash install.sh /opt/otp-board`；镜像/自托管源可用环境变量 `OTP_INSTALL_RAW` 覆盖下载地址。
+
+**手动安装：**
+
 ```bash
 cd server
 cp .env.example .env        # 按需设置 INGEST_TOKEN / ADMIN_TOKEN / PORT

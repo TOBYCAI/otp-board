@@ -68,6 +68,16 @@ Quick summary:
 
 ### 1. Server
 
+**One-click install (recommended, zero-config):**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/TOBYCAI/otp-board/main/server/install.sh | bash
+```
+
+The script will: check Node.js ≥ 18 → fetch `server/` + `shared/` (so `require('../shared/js/otp-core.js')` keeps resolving) → generate random `INGEST_TOKEN` / `ADMIN_TOKEN` → start the service via pm2 (or nohup fallback). Pass a directory as the first argument (`bash install.sh /opt/otp-board`); override the download source with the `OTP_INSTALL_RAW` env var for mirrors.
+
+**Manual install:**
+
 ```bash
 cd server
 cp .env.example .env        # set INGEST_TOKEN / ADMIN_TOKEN / PORT as needed
