@@ -66,32 +66,43 @@ Quick summary:
 
 ## Quick start
 
-Two kinds of users, pick one path — **no fork, no build required**.
+This project has two independent parts — the **Server** (dashboard / receiver) and the **Android** client — installed separately and not affecting each other:
 
-### Option A: Server one-click install (recommended, zero-config)
+- To set up the dashboard / receive forwarded codes → see the **Server** section below.
+- To collect codes on a phone and forward them → see the **Android client** section below.
+
+---
+
+### Server
+
+**Option 1: One-click install (recommended, zero-config)**
+
+On the machine that will run the server, run this single command — it installs and starts the dashboard automatically:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/TOBYCAI/otp-board/main/server/install.sh | bash
 ```
 
 - The script is **self-contained**: `server.js`, `shared/js/otp-core.js` and `package.json` are embedded in it — no runtime GitHub fetch, no network dependency. Just download this one file and run.
-- It will: check Node.js ≥ 18 → generate random `INGEST_TOKEN` / `ADMIN_TOKEN` into `.env` → start the service via pm2 (or nohup fallback). Pass a directory as the first argument (`bash install.sh /opt/otp-board`).
+- It will: check Node.js ≥ 18 → generate random `INGEST_TOKEN` / `ADMIN_TOKEN` into `.env` → start the service via pm2 (or nohup fallback). Pass a directory as the first argument (`bash install.sh /opt/otp-board`; default: `~/otp-board-server`).
 - Dashboard: `http://<host>:3000/` (use Nginx/Caddy for TLS in production, see `server/deploy/`).
 
-### Option B: Download the Release source zip (audit / hack on it)
+**Option 2: Download the Release source zip and run it (audit / hack on it)**
 
 1. Go to [Releases](https://github.com/TOBYCAI/otp-board/releases) and download `Source code (zip)`.
-2. Extract, then run the server directly:
+2. Extract, then go into the `server/` folder and run it directly:
 
    ```bash
-   cd otp-board-server/server
+   cd otp-board/server
    cp .env.example .env        # adjust port / tokens
    node server.js              # or: pm2 start server.js
    ```
 
 No `curl | bash`, everything is local — easy to audit or modify. The server has **zero third-party dependencies**, no `npm install` needed.
 
-### Option C: Android client (just install the APK)
+---
+
+### Android client
 
 No Android Studio, no build: go to [Releases](https://github.com/TOBYCAI/otp-board/releases) and download **`app-release.apk`** (attached automatically to every release), transfer it to your phone and install.
 

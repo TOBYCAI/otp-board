@@ -65,11 +65,18 @@ otp-board/
 
 ## 快速开始
 
-本项目面向两类使用者，按自己的角色选一条路即可——**无需 fork、无需编译**。
+本项目分两部分，**服务端（Server）** 与 **安卓客户端（Android）** 各自独立安装、互不影响：
 
-### 方式 A：服务端一键安装（推荐，零配置）
+- 想搭建看板 / 转发接收端 → 看下面 **服务端** 部分。
+- 想在手机上收验证码并转发 → 看下面 **安卓客户端** 部分。
 
-一行命令装好并直接启动看板：
+---
+
+### 服务端（Server）
+
+**方式一：一键安装（推荐，零配置）**
+
+在要跑服务端的机器上执行一行命令，自动装好并启动看板：
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/TOBYCAI/otp-board/main/server/install.sh | bash
@@ -77,23 +84,25 @@ curl -fsSL https://raw.githubusercontent.com/TOBYCAI/otp-board/main/server/insta
 
 - 脚本**自包含**：`server.js`、`shared/js/otp-core.js`、`package.json` 全部内嵌其中，运行时不依赖 GitHub、不联网拉取任何东西，下载这一个文件就能跑。
 - 自动完成：检测 Node.js ≥ 18 → 随机生成 `INGEST_TOKEN` / `ADMIN_TOKEN` 写入 `.env` → 用 pm2（无 pm2 时回退 nohup）启动服务。
-- 可选第一个参数指定目录：`bash install.sh /opt/otp-board`。
+- 可选第一个参数指定目录：`bash install.sh /opt/otp-board`（默认装到 `~/otp-board-server`）。
 - 看板启动后访问 `http://<host>:3000/`（生产建议用 Nginx/Caddy 做 HTTPS 反代，见 `server/deploy/`）。
 
-### 方式 B：下载 Release 源码包（适合想自己看 / 改代码）
+**方式二：下载 Release 源码包自己跑（适合审计 / 改代码）**
 
 1. 打开 [Releases](https://github.com/TOBYCAI/otp-board/releases) 页面，下载 `Source code (zip)`。
-2. 解压后进入 `server/`，直接运行：
+2. 解压后进入其中的 `server/` 目录，直接运行：
 
    ```bash
-   cd otp-board-server/server
+   cd otp-board/server
    cp .env.example .env        # 按需修改端口 / token
    node server.js              # 或：pm2 start server.js
    ```
 
 这种方式不需要 `curl | bash`，所有文件都在本地，方便审计与二次开发。服务端**零第三方依赖**，无需 `npm install`。
 
-### 方式 C：Android 客户端（直接装 APK）
+---
+
+### 安卓客户端（Android）
 
 不用装 Android Studio、不用编译——去 [Releases](https://github.com/TOBYCAI/otp-board/releases) 页面下载 **`app-release.apk`**（每个版本都会自动构建并附在 Release 里），传到手机安装即可。
 
