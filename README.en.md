@@ -139,4 +139,4 @@ SMS/notification → SmsReceiver / NotificationListener
 
 ## License
 
-[MIT](LICENSE) © OTP Board contributors
+[MIT](LICENSE) © TOBYCAI

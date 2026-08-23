@@ -140,4 +140,4 @@ cd android
 
 ## 许可证
 
-[MIT](LICENSE) © OTP Board contributors
+[MIT](LICENSE) © TOBYCAI
