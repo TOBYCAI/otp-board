@@ -1,5 +1,14 @@
 # OTP Board · OTP Forwarder & Dashboard
 
+> English | [中文](./README.md)
+
+![GitHub stars](https://img.shields.io/github/stars/TOBYCAI/otp-board?style=flat-square&color=facc15)
+![Downloads](https://img.shields.io/github/downloads/TOBYCAI/otp-board/total?style=flat-square&color=14b8a6)
+![Downloads@latest](https://img.shields.io/github/downloads/TOBYCAI/otp-board/latest/total?style=flat-square&color=14b8a6)
+![License](https://img.shields.io/badge/license-MIT-3b82f6?style=flat-square)
+![CI](https://img.shields.io/github/actions/workflow/status/TOBYCAI/otp-board/ci.yml?branch=main&label=ci&style=flat-square)
+![type](https://img.shields.io/badge/type-android--node-4d6bfe?style=flat-square)
+
 An open-source **one-time-passcode (OTP) auto-forwarding + web dashboard** project.
 The Android client listens locally for SMS and system notifications (WeChat, WhatsApp,
 email, …), extracts the code, and pushes it over HTTPS to your self-hosted Node.js

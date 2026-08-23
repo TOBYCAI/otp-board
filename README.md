@@ -1,5 +1,14 @@
 # OTP Board · 验证码转发与看板
 
+> 中文 | [English](./README.en.md)
+
+![GitHub stars](https://img.shields.io/github/stars/TOBYCAI/otp-board?style=flat-square&color=facc15)
+![Downloads](https://img.shields.io/github/downloads/TOBYCAI/otp-board/total?style=flat-square&color=14b8a6)
+![Downloads@latest](https://img.shields.io/github/downloads/TOBYCAI/otp-board/latest/total?style=flat-square&color=14b8a6)
+![License](https://img.shields.io/badge/license-MIT-3b82f6?style=flat-square)
+![CI](https://img.shields.io/github/actions/workflow/status/TOBYCAI/otp-board/ci.yml?branch=main&label=ci&style=flat-square)
+![type](https://img.shields.io/badge/type-android--node-4d6bfe?style=flat-square)
+
 一款开源的**验证码（OTP）自动转发 + 网页看板**项目。Android 客户端在本地监听短信、
 系统通知（微信 / WhatsApp / 邮件等），提取验证码后通过 HTTPS 推送到自建的 Node.js 看板，
 在浏览器中集中查看、管理与导出。
