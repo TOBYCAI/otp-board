@@ -3,9 +3,11 @@
 
     <!-- The durable delivery job lives in the shared core module and is merged
          into the app manifest at build time. -->
-    <service
-        android:name=".ForwardJobService"
-        android:exported="false"
-        android:permission="android.permission.BIND_JOB_SERVICE" />
+    <application>
+        <service
+            android:name=".ForwardJobService"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+    </application>
 
 </manifest>
