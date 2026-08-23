@@ -73,8 +73,8 @@ otp-board/
 curl -fsSL https://raw.githubusercontent.com/TOBYCAI/otp-board/main/server/install.sh | bash
 ```
 
-该脚本会自动：检测 Node.js ≥ 18 → 拉取 `server/` + `shared/`（保持 `require('../shared/js/otp-core.js')` 可解析）→ 用随机值生成 `INGEST_TOKEN` / `ADMIN_TOKEN` → 用 pm2（无 pm2 时回退 nohup）启动服务。
-可用第一个参数指定安装目录，例如 `bash install.sh /opt/otp-board`；镜像/自托管源可用环境变量 `OTP_INSTALL_RAW` 覆盖下载地址。
+该脚本是**自包含的**：`server.js`、`shared/js/otp-core.js`、`package.json` 全部内嵌在脚本里，无需联网拉取——下载这一个文件即可直接运行。它会自动：检测 Node.js ≥ 18 → 生成随机 `INGEST_TOKEN` / `ADMIN_TOKEN` 写入 `.env` → 用 pm2（无 pm2 时回退 nohup）启动服务。
+可用第一个参数指定安装目录，例如 `bash install.sh /opt/otp-board`。
 
 **手动安装：**
 
