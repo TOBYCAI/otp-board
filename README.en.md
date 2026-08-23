@@ -66,37 +66,56 @@ Quick summary:
 
 ## Quick start
 
-### 1. Server
+Two kinds of users, pick one path — **no fork, no build required**.
 
-**One-click install (recommended, zero-config):**
+### Option A: Server one-click install (recommended, zero-config)
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/TOBYCAI/otp-board/main/server/install.sh | bash
 ```
 
-The script is **self-contained**: `server.js`, `shared/js/otp-core.js` and `package.json` are all embedded in the script — no network fetch needed, just download this one file and run it. It will: check Node.js ≥ 18 → generate random `INGEST_TOKEN` / `ADMIN_TOKEN` into `.env` → start the service via pm2 (or nohup fallback). Pass a directory as the first argument (`bash install.sh /opt/otp-board`).
+- The script is **self-contained**: `server.js`, `shared/js/otp-core.js` and `package.json` are embedded in it — no runtime GitHub fetch, no network dependency. Just download this one file and run.
+- It will: check Node.js ≥ 18 → generate random `INGEST_TOKEN` / `ADMIN_TOKEN` into `.env` → start the service via pm2 (or nohup fallback). Pass a directory as the first argument (`bash install.sh /opt/otp-board`).
+- Dashboard: `http://<host>:3000/` (use Nginx/Caddy for TLS in production, see `server/deploy/`).
 
-**Manual install:**
+### Option B: Download the Release source zip (audit / hack on it)
 
-```bash
-cd server
-cp .env.example .env        # set INGEST_TOKEN / ADMIN_TOKEN / PORT as needed
-node server.js              # or: npm run dev / pm2 start server.js
-```
+1. Go to [Releases](https://github.com/TOBYCAI/otp-board/releases) and download `Source code (zip)`.
+2. Extract, then run the server directly:
 
-Dashboard: `http://<host>:3000/` (use Nginx/Caddy for TLS in production, see `server/deploy/`).
+   ```bash
+   cd otp-board-server/server
+   cp .env.example .env        # adjust port / tokens
+   node server.js              # or: pm2 start server.js
+   ```
 
-### 2. Android client
+No `curl | bash`, everything is local — easy to audit or modify. The server has **zero third-party dependencies**, no `npm install` needed.
 
-```bash
-cd android
-./gradlew :app:assembleDebug     # build app-debug.apk
-./gradlew :app:installDebug      # install to a connected device
-```
+### Option C: Android client (just install the APK)
 
-- Grant SMS-read and notification-listener permissions in the app.
-- Scan the server QR code ("扫码配置") or paste the HTTPS server URL (optional token).
+No Android Studio, no build: go to [Releases](https://github.com/TOBYCAI/otp-board/releases) and download **`app-release.apk`** (attached automatically to every release), transfer it to your phone and install.
+
+> The APK is built automatically by GitHub Actions on each tag (see `.github/workflows/build-apk.yml`), signed with the debug key — installs and runs fine on real devices (not a Play-Store distributable). For your own signing, clone and run `./gradlew :app:assembleRelease`.
+
+After install:
+
+- Grant SMS-read and notification-listener permissions (for WeChat / WhatsApp / email, etc.).
+- Scan the server QR code ("扫码配置") or paste the HTTPS URL (optional token).
 - Incoming codes are extracted and pushed to the dashboard automatically.
+
+---
+
+### Want to build from source?
+
+```bash
+# Server
+cd server && cp .env.example .env && node server.js
+
+# Android (needs JDK 17 + Android SDK 35)
+cd android
+./gradlew :app:assembleDebug      # output: app/build/outputs/apk/debug/app-debug.apk
+./gradlew :app:assembleRelease    # output: app/build/outputs/apk/release/app-release.apk
+```
 
 ---
 

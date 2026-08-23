@@ -65,38 +65,59 @@ otp-board/
 
 ## 快速开始
 
-### 1. 服务端
+本项目面向两类使用者，按自己的角色选一条路即可——**无需 fork、无需编译**。
 
-**一键安装（推荐，零配置）：**
+### 方式 A：服务端一键安装（推荐，零配置）
+
+一行命令装好并直接启动看板：
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/TOBYCAI/otp-board/main/server/install.sh | bash
 ```
 
-该脚本是**自包含的**：`server.js`、`shared/js/otp-core.js`、`package.json` 全部内嵌在脚本里，无需联网拉取——下载这一个文件即可直接运行。它会自动：检测 Node.js ≥ 18 → 生成随机 `INGEST_TOKEN` / `ADMIN_TOKEN` 写入 `.env` → 用 pm2（无 pm2 时回退 nohup）启动服务。
-可用第一个参数指定安装目录，例如 `bash install.sh /opt/otp-board`。
+- 脚本**自包含**：`server.js`、`shared/js/otp-core.js`、`package.json` 全部内嵌其中，运行时不依赖 GitHub、不联网拉取任何东西，下载这一个文件就能跑。
+- 自动完成：检测 Node.js ≥ 18 → 随机生成 `INGEST_TOKEN` / `ADMIN_TOKEN` 写入 `.env` → 用 pm2（无 pm2 时回退 nohup）启动服务。
+- 可选第一个参数指定目录：`bash install.sh /opt/otp-board`。
+- 看板启动后访问 `http://<host>:3000/`（生产建议用 Nginx/Caddy 做 HTTPS 反代，见 `server/deploy/`）。
 
-**手动安装：**
+### 方式 B：下载 Release 源码包（适合想自己看 / 改代码）
+
+1. 打开 [Releases](https://github.com/TOBYCAI/otp-board/releases) 页面，下载 `Source code (zip)`。
+2. 解压后进入 `server/`，直接运行：
+
+   ```bash
+   cd otp-board-server/server
+   cp .env.example .env        # 按需修改端口 / token
+   node server.js              # 或：pm2 start server.js
+   ```
+
+这种方式不需要 `curl | bash`，所有文件都在本地，方便审计与二次开发。服务端**零第三方依赖**，无需 `npm install`。
+
+### 方式 C：Android 客户端（直接装 APK）
+
+不用装 Android Studio、不用编译——去 [Releases](https://github.com/TOBYCAI/otp-board/releases) 页面下载 **`app-release.apk`**（每个版本都会自动构建并附在 Release 里），传到手机安装即可。
+
+> APK 由 GitHub Actions 在打 tag 时自动构建（见 `.github/workflows/build-apk.yml`），使用 Debug 签名，可正常安装到真机使用（非 Play 商店分发版）。如需自有签名，克隆仓库后自行 `./gradlew :app:assembleRelease` 即可。
+
+安装后：
+
+- 授权短信读取、通知读取（监听微信 / WhatsApp / 邮件等通知）。
+- 「扫码配置」扫描服务端二维码，或手动填 HTTPS 地址（可选 token）。
+- 收到验证码，App 自动提取并推送到看板。
+
+---
+
+### 只想自己从源码构建？
 
 ```bash
-cd server
-cp .env.example .env        # 按需设置 INGEST_TOKEN / ADMIN_TOKEN / PORT
-node server.js              # 或：npm run dev（热重载）/ pm2 start server.js
-```
+# 服务端
+cd server && cp .env.example .env && node server.js
 
-看板地址：`http://<host>:3000/`（生产环境建议用 Nginx/Caddy 做 TLS 反代，见 `server/deploy/`）。
-
-### 2. Android 客户端
-
-```bash
+# 安卓（需 JDK 17 + Android SDK 35）
 cd android
-./gradlew :app:assembleDebug     # 生成 app-debug.apk
-./gradlew :app:installDebug      # 安装到已连接设备
+./gradlew :app:assembleDebug      # 产物：app/build/outputs/apk/debug/app-debug.apk
+./gradlew :app:assembleRelease    # 产物：app/build/outputs/apk/release/app-release.apk
 ```
-
-- 在 App 中授权短信读取、通知读取权限。
-- 通过「扫码配置」扫描服务端二维码，或手动填入 HTTPS 服务器地址（可选 token）。
-- 收到验证码后，App 会自动提取并推送到看板。
 
 ---
 
