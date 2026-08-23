@@ -108,6 +108,16 @@ No Android Studio, no build: go to [Releases](https://github.com/TOBYCAI/otp-boa
 
 > The APK is built automatically by GitHub Actions on each tag (see `.github/workflows/build-apk.yml`), signed with the debug key — installs and runs fine on real devices (not a Play-Store distributable). For your own signing, clone and run `./gradlew :app:assembleRelease`.
 
+**The Android source is open too**: the full `android/` project (Kotlin + Gradle) ships with the repo, so you can modify it and rebuild yourself. Clone, change the code, then build:
+
+```bash
+cd android
+./gradlew :app:assembleDebug      # debug: app/build/outputs/apk/debug/app-debug.apk
+./gradlew :app:assembleRelease    # release: app/build/outputs/apk/release/app-release.apk
+```
+
+(Local build needs JDK 17 + Android SDK 35; if you'd rather not set that up, just use the Release APK above.)
+
 After install:
 
 - Grant SMS-read and notification-listener permissions (for WeChat / WhatsApp / email, etc.).

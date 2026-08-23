@@ -108,6 +108,16 @@ curl -fsSL https://raw.githubusercontent.com/TOBYCAI/otp-board/main/server/insta
 
 > APK 由 GitHub Actions 在打 tag 时自动构建（见 `.github/workflows/build-apk.yml`），使用 Debug 签名，可正常安装到真机使用（非 Play 商店分发版）。如需自有签名，克隆仓库后自行 `./gradlew :app:assembleRelease` 即可。
 
+**安卓源码也随仓库一并开源**：完整 `android/` 工程（Kotlin + Gradle）就在仓库里，可以自行修改、重新构建。克隆仓库后改代码再编译：
+
+```bash
+cd android
+./gradlew :app:assembleDebug      # 调试版：app/build/outputs/apk/debug/app-debug.apk
+./gradlew :app:assembleRelease    # 发布版：app/build/outputs/apk/release/app-release.apk
+```
+
+（本地编译需要 JDK 17 + Android SDK 35；不想装环境的话直接用上面的 Release APK 即可。）
+
 安装后：
 
 - 授权短信读取、通知读取（监听微信 / WhatsApp / 邮件等通知）。
