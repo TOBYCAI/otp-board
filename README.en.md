@@ -100,6 +100,11 @@ No Android Studio, no build: go to [Releases](https://github.com/TOBYCAI/otp-boa
 After install:
 
 - Grant SMS-read and notification-listener permissions (for WeChat / WhatsApp / email, etc.).
+- **Disable battery optimization (set to "Unrestricted" / allow background):** this is required in practice.
+  Without it, the OS kills the app when the screen is locked or after it has been in the background for a while,
+  so codes stop arriving and forwarding breaks. Typical path:
+  `Settings → Apps → OTP Board → Battery → Unrestricted` (names vary by vendor: Xiaomi "Battery saver = No restrictions",
+  Huawei "App launch = Manual + allow background", Samsung "Deep sleeping apps = exclude").
 - Scan the server QR code ("扫码配置") or paste the HTTPS URL (optional token).
 - Incoming codes are extracted and pushed to the dashboard automatically.
 
