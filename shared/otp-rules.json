@@ -1,0 +1,68 @@
+{
+  "_comment": "Single source of truth for OTP extraction / classification rules. Consumed by shared/js/otp-core.js (server side) and documented as the canonical data for android/otp-core (client side). Keep the Kotlin constants in OtpExtractor.kt in sync with this file.",
+  "whitelist": [
+    "验证码", "验码", "校验码", "认证码", "确认码", "安全码", "登录码", "登陆码",
+    "短信码", "动态码", "动态口令", "一次性密码", "一次性口令", "激活码",
+    "code", "otp", "verification", "pin", "token", "verify",
+    "verifying", "one-time", "one time", "security code", "authentication",
+    "authenticate", "confirmation", "password", "passcode", "login", "sign-in",
+    "sign in", "confirm", "secure", "weixin", "wechat", "linking"
+  ],
+  "blacklist": [
+    "促销", "优惠", "打折", "满减", "返利", "抽奖", "中奖", "领红包",
+    "退订回复TD", "回复T", "回复N",
+    "已发货", "取件码", "快递", "余额", "账单", "消费", "还款", "扣款"
+  ],
+  "carrierMap": {
+    "10000": "中国电信",
+    "10010": "中国联通",
+    "10086": "中国移动",
+    "10099": "中国广电",
+    "95588": "工商银行",
+    "95533": "建设银行",
+    "95555": "招商银行",
+    "95566": "中国银行",
+    "95599": "农业银行",
+    "95528": "浦发银行",
+    "95561": "兴业银行",
+    "95568": "民生银行",
+    "95559": "交通银行",
+    "95558": "中信银行",
+    "95511": "平安银行",
+    "95577": "华夏银行",
+    "95508": "广发银行",
+    "95580": "邮储银行"
+  },
+  "knownBrands": [
+    "Google", "ChatGPT", "OpenAI", "Microsoft", "Apple", "FaceBook",
+    "Instagram", "Twitter", "Alipay", "WeChat", "淘宝", "腾讯", "giffgaff"
+  ],
+  "supportedPackages": {
+    "com.google.android.apps.messaging": { "source": "SMS", "fallbackPlatform": "Google Messages" },
+    "com.android.mms": { "source": "SMS", "fallbackPlatform": "短信" },
+    "com.samsung.android.messaging": { "source": "SMS", "fallbackPlatform": "Samsung Messages" },
+    "com.miui.mms": { "source": "SMS", "fallbackPlatform": "小米短信" },
+    "com.huawei.message": { "source": "SMS", "fallbackPlatform": "华为信息" },
+    "com.coloros.mcs": { "source": "SMS", "fallbackPlatform": "OPPO 信息" },
+    "com.oneplus.mms": { "source": "SMS", "fallbackPlatform": "OnePlus Messages" },
+    "com.whatsapp": { "source": "WhatsApp", "fallbackPlatform": "WhatsApp" },
+    "com.whatsapp.w4b": { "source": "WhatsApp", "fallbackPlatform": "WhatsApp Business" },
+    "com.tencent.mm": { "source": "WeChat", "fallbackPlatform": "微信" },
+    "com.tencent.wework": { "source": "WeChat Work", "fallbackPlatform": "企业微信" },
+    "com.alibaba.android.rimet": { "source": "DingTalk", "fallbackPlatform": "钉钉" },
+    "com.ss.android.lark": { "source": "Feishu", "fallbackPlatform": "飞书" },
+    "com.bytedance.lark": { "source": "Lark", "fallbackPlatform": "Lark" },
+    "org.telegram.messenger": { "source": "Telegram", "fallbackPlatform": "Telegram" },
+    "org.thoughtcrime.securesms": { "source": "Signal", "fallbackPlatform": "Signal" },
+    "com.viber.voip": { "source": "Viber", "fallbackPlatform": "Viber" },
+    "com.google.android.gm": { "source": "Email", "fallbackPlatform": "Gmail" },
+    "com.microsoft.office.outlook": { "source": "Email", "fallbackPlatform": "Outlook" },
+    "com.tencent.androidqqmail": { "source": "Email", "fallbackPlatform": "QQ邮箱" },
+    "com.netease.mobimail": { "source": "Email", "fallbackPlatform": "网易邮箱" },
+    "com.yahoo.mobile.client.android.mail": { "source": "Email", "fallbackPlatform": "Yahoo Mail" },
+    "com.samsung.android.email.provider": { "source": "Email", "fallbackPlatform": "Samsung Email" },
+    "com.fsck.k9": { "source": "Email", "fallbackPlatform": "K-9 Mail" },
+    "eu.faircode.email": { "source": "Email", "fallbackPlatform": "FairEmail" },
+    "ch.protonmail.android": { "source": "Email", "fallbackPlatform": "Proton Mail" }
+  }
+}

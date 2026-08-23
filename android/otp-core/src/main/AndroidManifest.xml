@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- The durable delivery job lives in the shared core module and is merged
+         into the app manifest at build time. -->
+    <service
+        android:name=".ForwardJobService"
+        android:exported="false"
+        android:permission="android.permission.BIND_JOB_SERVICE" />
+
+</manifest>

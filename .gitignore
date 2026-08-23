@@ -1,0 +1,21 @@
+# Node / server
+node_modules/
+server/data/
+server/.env
+npm-debug.log*
+*.log
+
+# Android
+.gradle/
+android/app/build/
+android/otp-core/build/
+android/build/
+local.properties
+*.iml
+.idea/
+captures/
+.DS_Store
+
+# OS
+.DS_Store
+Thumbs.db

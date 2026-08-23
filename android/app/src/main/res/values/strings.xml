@@ -1,0 +1,55 @@
+<resources>
+    <string name="app_name">OTP</string>
+    <string name="dashboard_title">验证码转发</string>
+    <string name="dashboard_subtitle">短信、WhatsApp 与邮件通知，自动送达</string>
+    <string name="channel_title">安全通道</string>
+    <string name="channel_subtitle">端到端连接状态</string>
+    <string name="access_title">接入来源</string>
+    <string name="privacy_note">数据仅发送至你配置的服务器</string>
+    <string name="nav_server_settings">服务器设置</string>
+    <string name="nav_mode_switch">模式设置</string>
+    <string name="theme_follow_system">跟随系统</string>
+    <string name="theme_light">浅色模式</string>
+    <string name="theme_dark">深色模式</string>
+    <string name="theme_dialog_title">选择主题</string>
+
+    <string name="status_failed">连接失败：%s</string>
+    <string name="status_token_error">Token 校验失败 (403)</string>
+    <string name="status_too_many_requests">请求过于频繁 (429)</string>
+    <string name="status_http_error">服务器响应异常 (HTTP %d)</string>
+    <string name="status_testing">正在测试连接…</string>
+    <string name="status_success">连接成功</string>
+    <string name="status_invalid_url">服务器地址无效，请重新配置</string>
+    <string name="status_loading">正在读取服务器配置…</string>
+
+    <string name="hint_server_url">接收网址 (https://…)</string>
+    <string name="hint_push_token">推送 Token (可选)</string>
+    <string name="token_label">Token ·</string>
+    <string name="token_not_set">未设置</string>
+    <string name="token_set">已设置</string>
+    <string name="server_not_set">未配置</string>
+    <string name="server_label">服务器 ·</string>
+
+    <string name="toast_notification_access">请为 OTP 开启通知读取权限</string>
+    <string name="perm_sms_granted">短信读取已开启</string>
+    <string name="perm_sms_request">开启短信读取</string>
+    <string name="perm_notify_granted">通知读取已开启</string>
+    <string name="perm_notify_request">开启通知读取</string>
+    <string name="btn_test_conn">测试连接</string>
+    <string name="btn_scan_qr">扫描二维码配置服务器</string>
+
+    <string name="server_select_title">选择服务器</string>
+    <string name="server_empty_message">还没有保存的服务器</string>
+    <string name="server_add">添加服务器</string>
+    <string name="server_manage">管理服务器</string>
+    <string name="server_edit_title">服务器设置</string>
+    <string name="server_save">保存</string>
+    <string name="server_cancel">取消</string>
+    <string name="server_use">使用</string>
+    <string name="server_delete">删除</string>
+    <string name="server_deleted">服务器已删除</string>
+    <string name="server_switched">已切换服务器</string>
+    <string name="server_url_required">请输入有效的 HTTPS 地址</string>
+
+    <string name="cd_menu">打开菜单</string>
+</resources>

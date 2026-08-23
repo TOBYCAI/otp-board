@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/TOBYCAI/otp-board/raw/main/shared/proto/otp-payload.schema.json",
+  "title": "OTP Forwarder Payload",
+  "description": "Canonical contract between the Android client and the verification-code dashboard server. Both sides MUST conform to this shape. Server-side validation (server/server.js) and the shared JS core (shared/js/otp-core.js) enforce it.",
+  "type": "object",
+  "required": ["otp", "source", "platform", "time"],
+  "additionalProperties": true,
+  "properties": {
+    "otp": {
+      "type": "string",
+      "minLength": 4,
+      "maxLength": 16,
+      "description": "The extracted one-time code. Numeric (4-8 digits) or alphanumeric (e.g. ABCD-EFGH)."
+    },
+    "token": {
+      "type": "string",
+      "description": "Optional push token configured on the client. When present the server MUST check it against ADMIN/ingest token (HTTP 403 otherwise)."
+    },
+    "source": {
+      "type": "string",
+      "description": "Channel that produced the code. Decided by the client based on the ingestion path, NOT by the extractor.",
+      "enum": [
+        "SMS",
+        "WhatsApp",
+        "WhatsApp Business",
+        "WeChat",
+        "WeChat Work",
+        "DingTalk",
+        "Feishu",
+        "Lark",
+        "Telegram",
+        "Signal",
+        "Viber",
+        "Email",
+        "TestNotification",
+        "Test",
+        "AndroidApp"
+      ]
+    },
+    "platform": {
+      "type": "string",
+      "description": "Human-readable brand / service name inferred by the extractor (e.g. 腾讯, Google, 招商银行)."
+    },
+    "time": {
+      "type": "string",
+      "pattern": "^\\d{2}:\\d{2}:\\d{2}$",
+      "description": "Local wall-clock time HH:mm:ss at extraction."
+    }
+  }
+}
