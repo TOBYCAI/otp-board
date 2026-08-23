@@ -38,11 +38,7 @@
             </intent-filter>
         </service>
 
-        <!-- Durable delivery worker lives in the shared :otp-core library. -->
-        <service
-            android:name="com.example.otpforward.core.ForwardJobService"
-            android:exported="false"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
+        <!-- ForwardJobService is merged in from the :otp-core library module. -->
 
         <activity android:name=".MainActivity" android:exported="true">
             <intent-filter>
