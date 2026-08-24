@@ -63,17 +63,6 @@ android {
     }
 }
 
-// 产物与 App 名称统一：release 输出 OTP.apk（AGP 8.x 兼容写法）
-android {
-    applicationVariants.all {
-        if (name == "release") {
-            outputs.all {
-                outputFileName = "OTP.apk"
-            }
-        }
-    }
-}
-
 dependencies {
     implementation(project(":otp-core"))
 
