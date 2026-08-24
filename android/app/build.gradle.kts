@@ -6,8 +6,6 @@ plugins {
 android {
     namespace = "com.example.otpforward"
     compileSdk = 35
-    // 产物统一命名 OTP（输出 OTP-release.apk；CI 上传时再精简为 OTP.apk）
-    archivesName = "OTP"
 
     defaultConfig {
         applicationId = "com.example.otpforward"
@@ -62,6 +60,15 @@ android {
 
     kotlinOptions {
         jvmTarget = "17"
+    }
+}
+
+// 产物与 App 名称统一：release 输出 OTP.apk
+androidComponents {
+    onVariants(selector().withBuildType("release")) { variant ->
+        variant.outputs.forEach { output ->
+            output.outputFileName.set("OTP.apk")
+        }
     }
 }
 
