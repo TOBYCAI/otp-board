@@ -1,21 +1,17 @@
 [Unit]
-Description=OTP Board Server
+Description=OTP Board server
 After=network.target
 
 [Service]
 Type=simple
-User=www-data
+# Adjust to your actual install path (if you used install.sh, use that INSTALL_DIR/server).
 WorkingDirectory=/opt/otp-board/server
 ExecStart=/usr/bin/node /opt/otp-board/server/server.js
 Restart=on-failure
 RestartSec=5
-Environment=PORT=3000
-Environment=HOST=127.0.0.1
-# Paste a generated token here (openssl rand -hex 16):
-Environment=INGEST_TOKEN=
-Environment=ADMIN_TOKEN=
-Environment=DATA_FILE=/opt/otp-board/server/data/messages.json
-Environment=RETENTION_DAYS=7
+Environment=NODE_ENV=production
+# All runtime config (PORT / DOMAIN / ADMIN_PASSWORD / REFRESH_SEC / OTP_TOKEN)
+# is read from server/.env by server.js (loadDotEnv) — edit .env, not this file.
 
 [Install]
 WantedBy=multi-user.target

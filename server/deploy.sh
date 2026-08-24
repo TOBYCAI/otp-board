@@ -54,7 +54,7 @@ echo ""
 echo "== 3b. TLS reverse proxy (Caddy, simplest) =="
 echo "   # Caddyfile:"
 echo "   your.domain.example {"
-echo "       reverse_proxy 127.0.0.1:3000"
+echo "       reverse_proxy 127.0.0.1:3001"
 echo "   }"
 
 if [ "${1:-}" = "--write-systemd" ]; then
@@ -68,5 +68,5 @@ fi
 
 echo ""
 echo "== Verify =="
-echo "   curl -i http://127.0.0.1:3000/healthz"
+echo "   curl -i http://127.0.0.1:3001/healthz"
 echo "   # Open http://your.domain.example/ in a browser."
