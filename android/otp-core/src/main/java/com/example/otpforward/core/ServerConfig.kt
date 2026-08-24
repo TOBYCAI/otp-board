@@ -12,7 +12,8 @@ object ServerConfig {
     private const val K_URL = "server_url"
     private const val K_TOKEN = "otp_token"
     private const val K_LIST = "saved_urls"
-    const val DEFAULT_URL = "https://otp.wyywyf.top/otp"
+    // 占位符：安装后请在 App 内「服务器设置」填入你自己的服务端地址
+    const val DEFAULT_URL = "https://your-otp-server.example/otp"
 
     fun getUrl(c: Context) = prefs(c).getString(K_URL, DEFAULT_URL)!!
     fun setUrl(c: Context, u: String) = prefs(c).edit { putString(K_URL, u.trim()) }
