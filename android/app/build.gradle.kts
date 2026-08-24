@@ -6,6 +6,8 @@ plugins {
 android {
     namespace = "com.example.otpforward"
     compileSdk = 35
+    // 产物统一命名 OTP（输出 OTP-release.apk；CI 上传时再精简为 OTP.apk）
+    archivesName = "OTP"
 
     defaultConfig {
         applicationId = "com.example.otpforward"
