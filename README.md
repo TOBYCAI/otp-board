@@ -22,9 +22,9 @@
 - 🧠 **智能提取**：Kotlin 与 JavaScript 双端口共享同一套提取规则，准确率高。
 - 🔁 **持久投递**：基于 `JobScheduler` 的可靠转发，网络异常自动重试。
 - 🛡 **去重**：同一验证码 2 分钟窗口内只转发一次（跨进程 / 重启仍生效）。
-- 🖥 **双看板**：网页看板按「短信 / IM」与「邮件」分栏展示，支持删除、清空、CSV 导出。
-- 🔐 **鉴权与限流**：摄取接口可选 token；管理接口可选 admin token；按 IP 限流（429）。
-- 🧹 **自动清理**：每日 23:59 清理超过保留期的历史验证码。
+- 🖥 **双看板**：网页看板按「短信通道 / 其它通道」分栏展示，支持删除、清空、CSV 导出。
+- 🔐 **鉴权与审计**：管理控制台密码登录（可选 WebAuthn 面容/触控 ID 生物识别）；推送接口 Token 校验；按 IP 限流（429）与登录审计。
+- 🧹 **自动清理**：验证码 24 小时 TTL 淘汰 + 每日 23:59 自动清空，重启不丢（JSON 持久化）。
 - ⚙️ **一键部署服务端**：单文件自包含安装（`install.sh`，可 `curl | bash` 无人值守），功能与原版 **otp31.sh** 一致——管理控制台、WebAuthn 面容/触控 ID 登录、外部通知（Telegram/企业微信/飞书/Bark/Webhook/邮件）、限流与审计。
 
 ---
@@ -73,7 +73,7 @@ otp-board/
 
 ### 服务端（Server）
 
-**方式一：一键安装（推荐，零配置）**
+**方式一：一键安装（推荐）**
 
 在要跑服务端的机器上执行一行命令，自动装好并启动看板：
 
@@ -81,11 +81,11 @@ otp-board/
 curl -fsSL https://raw.githubusercontent.com/TOBYCAI/otp-board/main/server/install.sh | bash
 ```
 
-- 脚本**自包含**：`server.js`、`shared/js/otp-core.js`、`package.json` 全部内嵌其中，运行时不依赖 GitHub、不联网拉取任何东西，下载这一个文件就能跑。
-- **交互式向导**：在终端里直接运行 `bash install.sh` 时，会逐项询问安装目录、HTTP 端口、推送 Token、管理 Token、验证码保留天数、限流与开机自启方式，最后打印配置让你确认（y/n）后再安装——还原了原版 `otp31.sh` 的引导式体验。
-- **非终端自动跳过**：通过 `curl | bash` 管道运行时无交互，自动采用默认值并随机生成 `INGEST_TOKEN` / `ADMIN_TOKEN`，仍可一键无人值守部署。
+- 脚本**自包含**：`server.js`、`shared/js/otp-core.js`、`package.json` 全部内嵌其中，运行时不依赖 GitHub，下载这一个文件即可；依赖（express / @simplewebauthn/server / ws / nodemailer）由脚本自动 `npm install` 安装。
+- **交互式向导**：在终端里直接运行 `bash install.sh` 时，会逐项询问域名、管理控制台密码、前台刷新间隔、推送 Token、HTTP 端口与开机自启方式，最后打印配置让你确认（y/n）后再安装——还原了原版 `otp31.sh` 的引导式体验；若目标目录已有旧部署，会自动沿用原域名 / 密码 / Token。
+- **非终端自动跳过**：通过 `curl | bash` 管道运行时无交互，自动采用默认值并随机生成推送 Token，仍可一键无人值守部署。
 - 可选第一个参数指定目录：`bash install.sh /opt/otp-board`（默认装到 `~/otp-board-server`）。
-- 看板启动后访问 `http://<host>:3000/`（生产建议用 Nginx/Caddy 做 HTTPS 反代，见 `server/deploy/`）。
+- 看板启动后访问 `http://<host>:3001/`，管理控制台 `http://<host>:3001/admin`（生产建议用 Nginx/Caddy 做 HTTPS 反代，见 `server/deploy/`）。
 
 **方式二：下载 Release 源码包自己跑（适合审计 / 改代码）**
 
@@ -94,8 +94,9 @@ curl -fsSL https://raw.githubusercontent.com/TOBYCAI/otp-board/main/server/insta
 
    ```bash
    cd otp-board/server
-   cp .env.example .env        # 按需修改端口 / token
-   node server.js              # 或：pm2 start server.js
+   npm install             # 安装依赖（express / @simplewebauthn/server / ws / nodemailer）
+   cp .env.example .env    # 按需修改域名 / 管理密码 / 推送 Token / 端口
+   node server.js          # 或：pm2 start server.js
    ```
 
 这种方式不需要 `curl | bash`，所有文件都在本地，方便审计与二次开发。服务端依赖 `express` / `@simplewebauthn/server` / `ws` / `nodemailer`，首次运行前执行 `npm install` 即可。
@@ -104,16 +105,16 @@ curl -fsSL https://raw.githubusercontent.com/TOBYCAI/otp-board/main/server/insta
 
 ### 安卓客户端（Android）
 
-不用装 Android Studio、不用编译——去 [Releases](https://github.com/TOBYCAI/otp-board/releases) 页面下载 **`app-release.apk`**（每个版本都会自动构建并附在 Release 里），传到手机安装即可。
+不用装 Android Studio、不用编译——去 [Releases](https://github.com/TOBYCAI/otp-board/releases) 页面下载 **`OTP.apk`**（每个版本都会自动构建并附在 Release 里），传到手机安装即可。
 
-> APK 由 GitHub Actions 在打 tag 时自动构建（见 `.github/workflows/build-apk.yml`），使用 Debug 签名，可正常安装到真机使用（非 Play 商店分发版）。如需自有签名，克隆仓库后自行 `./gradlew :app:assembleRelease` 即可。
+> APK 由 GitHub Actions 在打 tag 时自动构建并用**生产 keystore 签名**（CN=TOBYCAI），可直接安装使用。
 
 **安卓源码也随仓库一并开源**：完整 `android/` 工程（Kotlin + Gradle）就在仓库里，可以自行修改、重新构建。克隆仓库后改代码再编译：
 
 ```bash
 cd android
 ./gradlew :app:assembleDebug      # 调试版：app/build/outputs/apk/debug/app-debug.apk
-./gradlew :app:assembleRelease    # 发布版：app/build/outputs/apk/release/app-release.apk
+./gradlew :app:assembleRelease    # 发布版：app-release.apk（CI 上传 Release 时命名为 OTP.apk）
 ```
 
 （本地编译需要 JDK 17 + Android SDK 35；不想装环境的话直接用上面的 Release APK 即可。）
@@ -125,7 +126,7 @@ cd android
   被系统杀掉，导致验证码收不到、转发中断。路径一般在
   `设置 → 应用 → OTP Board → 电池 → 不受限制`（各厂商叫法不同，如小米「省电策略=无限制」、
   华为「启动管理=手动管理并允许后台」、三星「深度休眠=排除」）。
-- 「扫码配置」扫描服务端二维码，或手动填 HTTPS 地址（可选 token）。
+- 「扫码配置」扫描包含服务器地址与 Token 的二维码（可自行生成），或手动填 HTTPS 地址（可选 token）。
 - 收到验证码，App 自动提取并推送到看板。
 
 ---
@@ -134,7 +135,7 @@ cd android
 
 ```bash
 # 服务端
-cd server && cp .env.example .env && node server.js
+cd server && npm install && cp .env.example .env && node server.js
 
 # 安卓（需 JDK 17 + Android SDK 35）
 cd android
@@ -152,7 +153,7 @@ cd android
         → OtpDeliveryDeduplicator       [去重]
         → OtpForwarder → ForwardJobService（JobScheduler 持久重试）
         → HTTPS POST /otp
-        → server.js 分类(短信/邮件) → 持久化 → 看板 / API
+        → server.js 分类(短信/其它) → 持久化 → 看板 / API
 ```
 
 ---

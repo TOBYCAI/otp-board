@@ -4,7 +4,6 @@
 
 ![GitHub stars](https://img.shields.io/github/stars/TOBYCAI/otp-board?style=flat-square&color=facc15)
 ![Downloads](https://img.shields.io/github/downloads/TOBYCAI/otp-board/total?style=flat-square&color=14b8a6)
-![Downloads@latest](https://img.shields.io/github/downloads/TOBYCAI/otp-board/latest/total?style=flat-square&color=14b8a6)
 ![License](https://img.shields.io/badge/license-MIT-3b82f6?style=flat-square)
 ![CI](https://img.shields.io/github/actions/workflow/status/TOBYCAI/otp-board/ci.yml?branch=main&label=ci&style=flat-square)
 ![type](https://img.shields.io/badge/type-android--node-4d6bfe?style=flat-square)
@@ -24,9 +23,9 @@ dashboard for centralized viewing, management, and export.
 - 🧠 **Smart extraction**: Kotlin and JavaScript share one extraction rule set, port-for-port.
 - 🔁 **Durable delivery**: `JobScheduler`-based forwarding with automatic retries.
 - 🛡 **De-duplication**: a code is forwarded at most once per 2-minute window (survives restart).
-- 🖥 **Two boards**: dashboard splits into "SMS / IM" and "Email", with delete / clear / CSV export.
-- 🔐 **Auth & rate limit**: optional ingest token, optional admin token, per-IP throttling (429).
-- 🧹 **Auto cleanup**: codes older than the retention window are pruned daily at 23:59.
+- 🖥 **Two boards**: dashboard splits into "SMS channel" and "Other channel", with delete / clear / CSV export.
+- 🔐 **Auth & audit**: admin console password login (optional WebAuthn biometrics); push API token check; per-IP throttling (429) + login audit.
+- 🧹 **Auto cleanup**: codes expire after a 24-hour TTL, plus a full daily clear at 23:59; persisted to JSON across restarts.
 - ⚙️ **One-click server installer**: self-contained `install.sh` (works with `curl | bash`), feature-parity with the original **otp31.sh** — admin console, WebAuthn biometric login, external notifications (Telegram / WeCom / Feishu / Bark / Webhook / Email), rate limiting & audit.
 
 ---
@@ -37,7 +36,7 @@ dashboard for centralized viewing, management, and export.
 otp-board/
 ├── shared/            # Cross-platform / cross-language contract & core (rules, schema, JS core)
 ├── android/           # Gradle multi-module: :otp-core reusable lib + :app thin UI
-├── server/            # Zero-dep Node.js dashboard + deploy examples (Nginx/systemd/Caddy)
+├── server/            # Server (WebAuthn / external notifications / admin console, otp31.sh parity)
 ├── docs/              # requirements.md (hardware list), ARCHITECTURE.md
 ├── scripts/           # validate-contract.js (CI contract check)
 └── .github/workflows/ # CI: core unit tests + contract validation
@@ -75,7 +74,7 @@ This project has two independent parts — the **Server** (dashboard / receiver)
 
 ### Server
 
-**Option 1: One-click install (recommended, zero-config)**
+**Option 1: One-click install (recommended)**
 
 On the machine that will run the server, run this single command — it installs and starts the dashboard automatically:
 
@@ -83,11 +82,11 @@ On the machine that will run the server, run this single command — it installs
 curl -fsSL https://raw.githubusercontent.com/TOBYCAI/otp-board/main/server/install.sh | bash
 ```
 
-- The script is **self-contained**: `server.js`, `shared/js/otp-core.js` and `package.json` are embedded in it — no runtime GitHub fetch, no network dependency. Just download this one file and run.
-- **Interactive wizard**: when you run `bash install.sh` directly in a terminal, it asks step by step for install dir, HTTP port, ingest token, admin token, retention days, rate limit and auto-start method, then prints a summary for you to confirm (y/n) before installing — mirroring the original `otp31.sh` guided experience.
-- **Non-interactive fallback**: when piped (`curl | bash`) there is no prompt — it uses safe defaults and auto-generates `INGEST_TOKEN` / `ADMIN_TOKEN`, so unattended one-click deploy still works.
+- The script is **self-contained**: `server.js`, `shared/js/otp-core.js` and `package.json` are embedded in it — no runtime GitHub fetch, just download this one file. Dependencies (express / @simplewebauthn/server / ws / nodemailer) are installed automatically via `npm install`.
+- **Interactive wizard**: when you run `bash install.sh` directly in a terminal, it asks step by step for domain, admin console password, front-desk refresh interval, push token, HTTP port and auto-start method, then prints a summary for you to confirm (y/n) before installing — mirroring the original `otp31.sh` guided experience. If the target dir already has a deployment, the old domain / password / token are reused automatically.
+- **Non-interactive fallback**: when piped (`curl | bash`) there is no prompt — it uses safe defaults and auto-generates the push token, so unattended one-click deploy still works.
 - Pass a directory as the first argument (`bash install.sh /opt/otp-board`; default: `~/otp-board-server`).
-- Dashboard: `http://<host>:3000/` (use Nginx/Caddy for TLS in production, see `server/deploy/`).
+- Dashboard: `http://<host>:3001/`, admin console: `http://<host>:3001/admin` (use Nginx/Caddy for TLS in production, see `server/deploy/`).
 
 **Option 2: Download the Release source zip and run it (audit / hack on it)**
 
@@ -96,8 +95,9 @@ curl -fsSL https://raw.githubusercontent.com/TOBYCAI/otp-board/main/server/insta
 
    ```bash
    cd otp-board/server
-   cp .env.example .env        # adjust port / tokens
-   node server.js              # or: pm2 start server.js
+   npm install             # deps: express / @simplewebauthn/server / ws / nodemailer
+   cp .env.example .env    # adjust domain / admin password / push token / port
+   node server.js          # or: pm2 start server.js
    ```
 
 No `curl | bash`, everything is local — easy to audit or modify. The server depends on `express` / `@simplewebauthn/server` / `ws` / `nodemailer`; run `npm install` once before first start.
@@ -106,16 +106,16 @@ No `curl | bash`, everything is local — easy to audit or modify. The server de
 
 ### Android client
 
-No Android Studio, no build: go to [Releases](https://github.com/TOBYCAI/otp-board/releases) and download **`app-release.apk`** (attached automatically to every release), transfer it to your phone and install.
+No Android Studio, no build: go to [Releases](https://github.com/TOBYCAI/otp-board/releases) and download **`OTP.apk`** (attached automatically to every release), transfer it to your phone and install.
 
-> The APK is built automatically by GitHub Actions on each tag (see `.github/workflows/build-apk.yml`), signed with the debug key — installs and runs fine on real devices (not a Play-Store distributable). For your own signing, clone and run `./gradlew :app:assembleRelease`.
+> The APK is built automatically by GitHub Actions on each tag and signed with the **production keystore** (CN=TOBYCAI) — installable right away.
 
 **The Android source is open too**: the full `android/` project (Kotlin + Gradle) ships with the repo, so you can modify it and rebuild yourself. Clone, change the code, then build:
 
 ```bash
 cd android
 ./gradlew :app:assembleDebug      # debug: app/build/outputs/apk/debug/app-debug.apk
-./gradlew :app:assembleRelease    # release: app/build/outputs/apk/release/app-release.apk
+./gradlew :app:assembleRelease    # release: app-release.apk (renamed OTP.apk on the Release page)
 ```
 
 (Local build needs JDK 17 + Android SDK 35; if you'd rather not set that up, just use the Release APK above.)
@@ -128,7 +128,7 @@ After install:
   so codes stop arriving and forwarding breaks. Typical path:
   `Settings → Apps → OTP Board → Battery → Unrestricted` (names vary by vendor: Xiaomi "Battery saver = No restrictions",
   Huawei "App launch = Manual + allow background", Samsung "Deep sleeping apps = exclude").
-- Scan the server QR code ("扫码配置") or paste the HTTPS URL (optional token).
+- Scan a QR code carrying the server URL & token ("扫码配置"), or paste the HTTPS URL manually (optional token).
 - Incoming codes are extracted and pushed to the dashboard automatically.
 
 ---
@@ -137,7 +137,7 @@ After install:
 
 ```bash
 # Server
-cd server && cp .env.example .env && node server.js
+cd server && npm install && cp .env.example .env && node server.js
 
 # Android (needs JDK 17 + Android SDK 35)
 cd android
@@ -155,7 +155,7 @@ SMS/notification → SmsReceiver / NotificationListener
         → OtpDeliveryDeduplicator       [de-dup]
         → OtpForwarder → ForwardJobService (JobScheduler retries)
         → HTTPS POST /otp
-        → server.js classify(SMS/Email) → persist → dashboard / API
+        → server.js classify(SMS/Other) → persist → dashboard / API
 ```
 
 ---
