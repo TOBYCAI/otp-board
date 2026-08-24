@@ -19,12 +19,37 @@ android {
         resValues = true
     }
 
+    signingConfigs {
+        create("release") {
+            val keyPath = System.getenv("KEYSTORE_PATH")
+                ?: providers.gradleProperty("KEYSTORE_PATH").orNull
+            if (keyPath != null) {
+                storeFile = file(keyPath)
+                storePassword = System.getenv("KEYSTORE_PASSWORD")
+                    ?: providers.gradleProperty("KEYSTORE_PASSWORD").orNull
+                    ?: ""
+                keyAlias = System.getenv("KEY_ALIAS")
+                    ?: providers.gradleProperty("KEY_ALIAS").orNull
+                    ?: ""
+                keyPassword = System.getenv("KEY_PASSWORD")
+                    ?: providers.gradleProperty("KEY_PASSWORD").orNull
+                    ?: ""
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
-            // Produce an installable local release artifact signed with the same development
-            // key as debug builds. Replace this with the production keystore for distribution.
-            signingConfig = signingConfigs.getByName("debug")
+            // 生产签名：设置 KEYSTORE_PATH(或 -PKEYSTORE_PATH=...) 时用生产 keystore 签名；
+            // 未配置时回退 debug 签名（保持本地开发可构建）。
+            val hasKey = System.getenv("KEYSTORE_PATH") != null
+                || providers.gradleProperty("KEYSTORE_PATH").isPresent
+            signingConfig = if (hasKey) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
         }
     }
 

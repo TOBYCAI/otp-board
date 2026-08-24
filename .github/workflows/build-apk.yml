@@ -39,8 +39,24 @@ jobs:
         working-directory: android
         run: chmod +x ./gradlew
 
+      - name: Decode signing keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > "$GITHUB_WORKSPACE/keystore.jks"
+            echo "keystore 已解码到 $GITHUB_WORKSPACE/keystore.jks"
+          else
+            echo "警告: 未配置 KEYSTORE_BASE64 secret，将使用 debug 签名"
+          fi
+
       - name: Build release APK
         working-directory: android
+        env:
+          KEYSTORE_PATH: ${{ github.workspace }}/keystore.jks
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: ./gradlew :app:assembleRelease --no-daemon
 
       - name: Locate APK
