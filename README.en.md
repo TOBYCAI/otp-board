@@ -27,7 +27,7 @@ dashboard for centralized viewing, management, and export.
 - 🖥 **Two boards**: dashboard splits into "SMS / IM" and "Email", with delete / clear / CSV export.
 - 🔐 **Auth & rate limit**: optional ingest token, optional admin token, per-IP throttling (429).
 - 🧹 **Auto cleanup**: codes older than the retention window are pruned daily at 23:59.
-- ⚙️ **Zero-dependency server**: only Node.js built-ins — no third-party `npm install` needed.
+- ⚙️ **One-click server installer**: self-contained `install.sh` (works with `curl | bash`), feature-parity with the original **otp31.sh** — admin console, WebAuthn biometric login, external notifications (Telegram / WeCom / Feishu / Bark / Webhook / Email), rate limiting & audit.
 
 ---
 
@@ -100,7 +100,7 @@ curl -fsSL https://raw.githubusercontent.com/TOBYCAI/otp-board/main/server/insta
    node server.js              # or: pm2 start server.js
    ```
 
-No `curl | bash`, everything is local — easy to audit or modify. The server has **zero third-party dependencies**, no `npm install` needed.
+No `curl | bash`, everything is local — easy to audit or modify. The server depends on `express` / `@simplewebauthn/server` / `ws` / `nodemailer`; run `npm install` once before first start.
 
 ---
 

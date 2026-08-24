@@ -23,7 +23,7 @@ fi
 echo ""
 echo "== 1. Configure =="
 echo "   cp .env.example .env"
-echo "   # edit .env: set INGEST_TOKEN, ADMIN_TOKEN, PORT ..."
+echo "   # edit .env: set DOMAIN, ADMIN_PASSWORD, OTP_TOKEN, PORT ..."
 
 echo ""
 echo "== 2a. Run directly (dev) =="

@@ -25,7 +25,7 @@
 - 🖥 **双看板**：网页看板按「短信 / IM」与「邮件」分栏展示，支持删除、清空、CSV 导出。
 - 🔐 **鉴权与限流**：摄取接口可选 token；管理接口可选 admin token；按 IP 限流（429）。
 - 🧹 **自动清理**：每日 23:59 清理超过保留期的历史验证码。
-- ⚙️ **零依赖服务端**：仅用 Node.js 内置模块，无需 `npm install` 任何第三方包。
+- ⚙️ **一键部署服务端**：单文件自包含安装（`install.sh`，可 `curl | bash` 无人值守），功能与原版 **otp31.sh** 一致——管理控制台、WebAuthn 面容/触控 ID 登录、外部通知（Telegram/企业微信/飞书/Bark/Webhook/邮件）、限流与审计。
 
 ---
 
@@ -35,7 +35,7 @@
 otp-board/
 ├── shared/            # 跨端 / 跨语言共用契约与核心（提取规则、负载 schema、JS 核心）
 ├── android/           # Gradle 多模块：:otp-core 复用库 + :app 薄壳 UI
-├── server/            # 零依赖 Node.js 看板服务 + 部署示例（Nginx/systemd/Caddy）
+├── server/            # 服务端（WebAuthn/外部通知/管理控制台，功能对齐 otp31.sh）+ 部署示例
 ├── docs/              # requirements.md（硬件设备清单）、ARCHITECTURE.md（架构说明）
 ├── scripts/           # validate-contract.js（CI 校验契约一致性）
 └── .github/workflows/ # CI：核心单元测试 + 契约校验
@@ -98,7 +98,7 @@ curl -fsSL https://raw.githubusercontent.com/TOBYCAI/otp-board/main/server/insta
    node server.js              # 或：pm2 start server.js
    ```
 
-这种方式不需要 `curl | bash`，所有文件都在本地，方便审计与二次开发。服务端**零第三方依赖**，无需 `npm install`。
+这种方式不需要 `curl | bash`，所有文件都在本地，方便审计与二次开发。服务端依赖 `express` / `@simplewebauthn/server` / `ws` / `nodemailer`，首次运行前执行 `npm install` 即可。
 
 ---
 
