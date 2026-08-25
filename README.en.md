@@ -171,6 +171,22 @@ SMS/notification → SmsReceiver / NotificationListener
 
 ---
 
+## Security & Privacy
+
+OTP Board is designed as a **personal / self-hosted** tool. Here is how it handles your messages and codes:
+
+- **Extraction happens on-device**: code recognition and extraction run entirely on the Android device (`SmsReceiver` and `NotificationListener` both call `OtpExtractor.process()`). The rules are implemented 1:1 in Kotlin (Android) and JavaScript (server mirror).
+- **Only the code is forwarded, never the raw text**: the app sends **only the extracted** `{otp, source, platform, time}` over HTTPS POST to your server — the **original SMS / notification body is never transmitted or uploaded**.
+- **The server does not do primary extraction**: `shared/js/otp-core.js` is a same-rule mirror of the Android extractor, used only as a **fallback** — it re-extracts only when a legacy client or an email-ingestion path sends raw `content`. The current app's main path extracts on-device, so the server normally never sees the raw body.
+- **The server keeps only the extracted result**: the dashboard persists only `{otp, source, time, platform}`, with a 24-hour TTL plus a daily clear at 23:59 (JSON-backed). No original message content is stored.
+- **Data goes only to your own server**: all pushes go solely to the HTTPS endpoint you configure in the app — **no third-party cloud, no telemetry**.
+- **External notifications are opt-in**: codes are forwarded to Telegram / WeCom / Feishu / Bark / Webhook / Email **only if you configure those channels**. Without them, nothing leaves your device or your server.
+- **Endpoint & console hardening**: the push API checks a Token (`OTP_TOKEN` / `x-token`), rate-limits per IP (429), and keeps an audit log; the admin console requires a password and optionally WebAuthn biometrics.
+
+If you have any privacy concerns, open an issue — the entire project (including `install.sh`) is open source and auditable.
+
+---
+
 ## License
 
 [MIT](LICENSE) © TOBYCAI
