@@ -26,7 +26,7 @@ dashboard for centralized viewing, management, and export.
 - 🖥 **Two boards**: dashboard splits into "SMS channel" and "Other channel", with delete / clear / CSV export.
 - 🔐 **Auth & audit**: admin console password login (optional WebAuthn biometrics); push API token check; per-IP throttling (429) + login audit.
 - 🧹 **Auto cleanup**: codes expire after a 24-hour TTL, plus a full daily clear at 23:59; persisted to JSON across restarts.
-- ⚙️ **One-click server installer**: self-contained `install.sh` (works with `curl | bash`), feature-parity with the original **otp31.sh** — admin console, WebAuthn biometric login, external notifications (Telegram / WeCom / Feishu / Bark / Webhook / Email), rate limiting & audit.
+- ⚙️ **One-click server installer**: self-contained `install.sh` (works with `curl | bash`) — admin console, WebAuthn biometric login, external notifications (Telegram / WeCom / Feishu / Bark / Webhook / Email), rate limiting & audit, out of the box.
 
 ---
 
@@ -36,7 +36,7 @@ dashboard for centralized viewing, management, and export.
 otp-board/
 ├── shared/            # Cross-platform / cross-language contract & core (rules, schema, JS core)
 ├── android/           # Gradle multi-module: :otp-core reusable lib + :app thin UI
-├── server/            # Server (WebAuthn / external notifications / admin console, otp31.sh parity)
+├── server/            # Server (WebAuthn / external notifications / admin console)
 ├── docs/              # requirements.md (hardware list), ARCHITECTURE.md
 ├── scripts/           # validate-contract.js (CI contract check)
 └── .github/workflows/ # CI: core unit tests + contract validation
@@ -83,7 +83,7 @@ curl -fsSL https://raw.githubusercontent.com/TOBYCAI/otp-board/main/server/insta
 ```
 
 - The script is **self-contained**: `server.js`, `shared/js/otp-core.js` and `package.json` are embedded in it — no runtime GitHub fetch, just download this one file. Dependencies (express / @simplewebauthn/server / ws / nodemailer) are installed automatically via `npm install`.
-- **Interactive wizard**: when you run `bash install.sh` directly in a terminal, it asks step by step for domain, admin console password, front-desk refresh interval, push token, HTTP port and auto-start method, then prints a summary for you to confirm (y/n) before installing — mirroring the original `otp31.sh` guided experience. If the target dir already has a deployment, the old domain / password / token are reused automatically.
+- **Interactive wizard**: when you run `bash install.sh` directly in a terminal, it asks step by step for domain, admin console password, front-desk refresh interval, push token, HTTP port and auto-start method, then prints a summary for you to confirm (y/n) before installing. If the target dir already has a deployment, the old domain / password / token are reused automatically.
 - **Non-interactive fallback**: when piped (`curl | bash`) there is no prompt — it uses safe defaults and auto-generates the push token, so unattended one-click deploy still works.
 - Pass a directory as the first argument (`bash install.sh /opt/otp-board`; default: `~/otp-board-server`).
 - Dashboard: `http://<host>:3001/`, admin console: `http://<host>:3001/admin` (use Nginx/Caddy for TLS in production, see `server/deploy/`).
@@ -108,6 +108,8 @@ No `curl | bash`, everything is local — easy to audit or modify. The server de
 
 No Android Studio, no build: go to [Releases](https://github.com/TOBYCAI/otp-board/releases) and download **`OTP.apk`** (attached automatically to every release), transfer it to your phone and install.
 
+> 🎨 The APK ships a polished Liquid Glass **adaptive icon** (Möbius O design) — looks crisp on the home screen, app drawer and settings.
+>
 > The APK is built automatically by GitHub Actions on each tag and signed with the **production keystore** (CN=TOBYCAI) — installable right away.
 
 **The Android source is open too**: the full `android/` project (Kotlin + Gradle) ships with the repo, so you can modify it and rebuild yourself. Clone, change the code, then build:

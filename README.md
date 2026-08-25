@@ -25,7 +25,7 @@
 - 🖥 **双看板**：网页看板按「短信通道 / 其它通道」分栏展示，支持删除、清空、CSV 导出。
 - 🔐 **鉴权与审计**：管理控制台密码登录（可选 WebAuthn 面容/触控 ID 生物识别）；推送接口 Token 校验；按 IP 限流（429）与登录审计。
 - 🧹 **自动清理**：验证码 24 小时 TTL 淘汰 + 每日 23:59 自动清空，重启不丢（JSON 持久化）。
-- ⚙️ **一键部署服务端**：单文件自包含安装（`install.sh`，可 `curl | bash` 无人值守），功能与原版 **otp31.sh** 一致——管理控制台、WebAuthn 面容/触控 ID 登录、外部通知（Telegram/企业微信/飞书/Bark/Webhook/邮件）、限流与审计。
+- ⚙️ **一键部署服务端**：单文件自包含安装（`install.sh`，可 `curl | bash` 无人值守）——管理控制台、WebAuthn 面容/触控 ID 登录、外部通知（Telegram/企业微信/飞书/Bark/Webhook/邮件）、限流与审计，开箱即用。
 
 ---
 
@@ -35,7 +35,7 @@
 otp-board/
 ├── shared/            # 跨端 / 跨语言共用契约与核心（提取规则、负载 schema、JS 核心）
 ├── android/           # Gradle 多模块：:otp-core 复用库 + :app 薄壳 UI
-├── server/            # 服务端（WebAuthn/外部通知/管理控制台，功能对齐 otp31.sh）+ 部署示例
+├── server/            # 服务端（WebAuthn/外部通知/管理控制台）+ 部署示例
 ├── docs/              # requirements.md（硬件设备清单）、ARCHITECTURE.md（架构说明）
 ├── scripts/           # validate-contract.js（CI 校验契约一致性）
 └── .github/workflows/ # CI：核心单元测试 + 契约校验
@@ -82,7 +82,7 @@ curl -fsSL https://raw.githubusercontent.com/TOBYCAI/otp-board/main/server/insta
 ```
 
 - 脚本**自包含**：`server.js`、`shared/js/otp-core.js`、`package.json` 全部内嵌其中，运行时不依赖 GitHub，下载这一个文件即可；依赖（express / @simplewebauthn/server / ws / nodemailer）由脚本自动 `npm install` 安装。
-- **交互式向导**：在终端里直接运行 `bash install.sh` 时，会逐项询问域名、管理控制台密码、前台刷新间隔、推送 Token、HTTP 端口与开机自启方式，最后打印配置让你确认（y/n）后再安装——还原了原版 `otp31.sh` 的引导式体验；若目标目录已有旧部署，会自动沿用原域名 / 密码 / Token。
+- **交互式向导**：在终端里直接运行 `bash install.sh` 时，会逐项询问域名、管理控制台密码、前台刷新间隔、推送 Token、HTTP 端口与开机自启方式，最后打印配置让你确认（y/n）后再安装；若目标目录已有旧部署，会自动沿用原域名 / 密码 / Token。
 - **非终端自动跳过**：通过 `curl | bash` 管道运行时无交互，自动采用默认值并随机生成推送 Token，仍可一键无人值守部署。
 - 可选第一个参数指定目录：`bash install.sh /opt/otp-board`（默认装到 `~/otp-board-server`）。
 - 看板启动后访问 `http://<host>:3001/`，管理控制台 `http://<host>:3001/admin`（生产建议用 Nginx/Caddy 做 HTTPS 反代，见 `server/deploy/`）。
@@ -107,6 +107,8 @@ curl -fsSL https://raw.githubusercontent.com/TOBYCAI/otp-board/main/server/insta
 
 不用装 Android Studio、不用编译——去 [Releases](https://github.com/TOBYCAI/otp-board/releases) 页面下载 **`OTP.apk`**（每个版本都会自动构建并附在 Release 里），传到手机安装即可。
 
+> 🎨 APK 采用 Liquid Glass 风格**自适应图标**（Möbius O 设计），桌面 / 应用抽屉 / 设置页均精致显示。
+>
 > APK 由 GitHub Actions 在打 tag 时自动构建并用**生产 keystore 签名**（CN=TOBYCAI），可直接安装使用。
 
 **安卓源码也随仓库一并开源**：完整 `android/` 工程（Kotlin + Gradle）就在仓库里，可以自行修改、重新构建。克隆仓库后改代码再编译：

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # OTP Board — self-contained one-click server installer.
-# Feature-parity with the original otp31.sh (interactive wizard, domain / admin
+# Self-contained one-click installer with interactive wizard (domain / admin
 # password / refresh interval / push token / 4-way auto-start, upgrade detection)
 # PLUS otp-board compatibility (x-token header, server-side content extraction).
 #
@@ -46,7 +46,7 @@ ask() {
 
 echo "============================================"
 echo "  OTP Board 服务端 v3.2 一键部署"
-echo "  （与原版 otp31.sh 功能一致 + otp-board 兼容）"
+echo "  （开箱即用：管理控制台 / WebAuthn / 外部通知 / PWA，兼容 otp-board Android 客户端推送）"
 echo "============================================"
 echo ""
 
@@ -1579,7 +1579,7 @@ cat > server/package.json <<'___PKG___'
 {
   "name": "otp-board-server",
   "version": "3.2.0",
-  "description": "OTP 验证码看板服务端（与原版 otp31.sh 功能一致：WebAuthn 生物识别 / 外部通知 / 管理控制台；兼容 otp-board 推送）",
+  "description": "OTP 验证码看板服务端（WebAuthn 生物识别 / 外部通知 / 管理控制台；兼容 otp-board Android 客户端推送）",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
