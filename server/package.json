@@ -1,6 +1,6 @@
 {
   "name": "otp-board-server",
-  "version": "3.1.1",
+  "version": "3.2.0",
   "description": "Zero-dependency Node.js ingestion + dashboard server for the OTP forwarder (reuses shared/js/otp-core).",
   "main": "server.js",
   "scripts": {

@@ -1372,7 +1372,7 @@ scheduleCleanup()
 const PORT = process.env.PORT || 3001
 // 绑定 0.0.0.0：本地 localhost 与局域网/隧道都能访问；生产环境由反代转发，同样适用
 const server = app.listen(PORT, '0.0.0.0', function() {
-  console.log('OTP v3.1 服务已启动，端口:', PORT)
+  console.log('OTP v3.2 服务已启动，端口:', PORT)
   console.log('管理控制台: http://127.0.0.1:' + PORT + '/admin')
 })
 // 端口被占用时给出明确提示并退出，而不是静默崩溃
