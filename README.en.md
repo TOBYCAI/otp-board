@@ -76,15 +76,24 @@ This project has two independent parts — the **Server** (dashboard / receiver)
 
 **Option 1: One-click install (recommended)**
 
-On the machine that will run the server, run this single command — it installs and starts the dashboard automatically:
+otp-board offers two one-click install modes — pick whichever fits:
+
+**① Interactive install (recommended default)** — asks step by step for domain, admin password, refresh interval, push token, HTTP port and auto-start method, then confirms before installing:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/TOBYCAI/otp-board/main/server/install.sh -o install.sh && bash install.sh
+```
+
+- This downloads the script to a local `install.sh` first, then runs it in a **real terminal**, so it enters the interactive wizard. If the target dir already has a deployment, the old domain / password / token are reused automatically.
+- You can `cat install.sh` to review it before running (the script is in a public repo and fully auditable).
+
+**② Unattended install (servers / CI)** — uses safe defaults (localhost + a random push token) and finishes without prompting:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/TOBYCAI/otp-board/main/server/install.sh | bash
 ```
 
 - The script is **self-contained**: `server.js`, `shared/js/otp-core.js` and `package.json` are embedded in it — no runtime GitHub fetch, just download this one file. Dependencies (express / @simplewebauthn/server / ws / nodemailer) are installed automatically via `npm install`.
-- **Interactive wizard**: when you run `bash install.sh` directly in a terminal, it asks step by step for domain, admin console password, front-desk refresh interval, push token, HTTP port and auto-start method, then prints a summary for you to confirm (y/n) before installing. If the target dir already has a deployment, the old domain / password / token are reused automatically.
-- **Non-interactive fallback**: when piped (`curl | bash`) there is no prompt — it uses safe defaults and auto-generates the push token, so unattended one-click deploy still works.
 - Pass a directory as the first argument (`bash install.sh /opt/otp-board`; default: `~/otp-board-server`).
 - Dashboard: `http://<host>:3001/`, admin console: `http://<host>:3001/admin` (use Nginx/Caddy for TLS in production, see `server/deploy/`).
 

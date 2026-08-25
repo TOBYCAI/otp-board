@@ -75,15 +75,24 @@ otp-board/
 
 **方式一：一键安装（推荐）**
 
-在要跑服务端的机器上执行一行命令，自动装好并启动看板：
+otp-board 提供两种一键安装方式，按需选择：
+
+**① 交互式安装（默认推荐）** —— 会逐项询问域名、管理控制台密码、刷新间隔、推送 Token、HTTP 端口与开机自启方式，最后确认后再安装：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/TOBYCAI/otp-board/main/server/install.sh -o install.sh && bash install.sh
+```
+
+- 这条命令先把脚本下载到本地 `install.sh`，再用**真实终端**运行它，因此会进入交互式向导；若目标目录已有旧部署，会自动沿用原域名 / 密码 / Token。
+- 建议先 `cat install.sh` 看一眼内容再运行（脚本在公开仓库中完全可见、可审计）。
+
+**② 无人值守安装（服务器 / CI）** —— 使用默认值（localhost + 随机推送 Token）直接装完，不询问：
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/TOBYCAI/otp-board/main/server/install.sh | bash
 ```
 
 - 脚本**自包含**：`server.js`、`shared/js/otp-core.js`、`package.json` 全部内嵌其中，运行时不依赖 GitHub，下载这一个文件即可；依赖（express / @simplewebauthn/server / ws / nodemailer）由脚本自动 `npm install` 安装。
-- **交互式向导**：在终端里直接运行 `bash install.sh` 时，会逐项询问域名、管理控制台密码、前台刷新间隔、推送 Token、HTTP 端口与开机自启方式，最后打印配置让你确认（y/n）后再安装；若目标目录已有旧部署，会自动沿用原域名 / 密码 / Token。
-- **非终端自动跳过**：通过 `curl | bash` 管道运行时无交互，自动采用默认值并随机生成推送 Token，仍可一键无人值守部署。
 - 可选第一个参数指定目录：`bash install.sh /opt/otp-board`（默认装到 `~/otp-board-server`）。
 - 看板启动后访问 `http://<host>:3001/`，管理控制台 `http://<host>:3001/admin`（生产建议用 Nginx/Caddy 做 HTTPS 反代，见 `server/deploy/`）。
 
