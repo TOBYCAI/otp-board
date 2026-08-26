@@ -189,4 +189,4 @@ If you have any privacy concerns, open an issue — the entire project (includin
 
 ## License
 
-[MIT](LICENSE) © TOBYCAI
+[MIT](LICENSE) © @TOBYCAI
