@@ -187,4 +187,4 @@ OTP Board 设计为**纯自用 / self-hosted** 工具。以下说明它如何处
 
 ## 许可证
 
-[MIT](LICENSE) © @TOBYCAI
+[MIT](LICENSE) © TOBYCAI
