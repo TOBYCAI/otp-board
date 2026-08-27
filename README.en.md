@@ -8,14 +8,18 @@
 ![CI](https://img.shields.io/github/actions/workflow/status/TOBYCAI/otp-board/ci.yml?branch=main&label=ci&style=flat-square)
 ![type](https://img.shields.io/badge/type-android--node-4d6bfe?style=flat-square)
 
-![OTP Board demo: SMS arrives on the phone, the board syncs in real time](./docs/assets/demo-sidebyside.gif)
-
 An open-source **one-time-passcode (OTP) auto-forwarding + web dashboard** project.
 The Android client listens locally for SMS and system notifications (WeChat, WhatsApp,
 email, …), extracts the code, and pushes it over HTTPS to your self-hosted Node.js
 dashboard for centralized viewing, management, and export.
 
 > All data is sent only to **the server you configure** — no third-party cloud required.
+
+---
+
+## Demo
+
+![OTP Board demo: SMS arrives on the phone, the board syncs in real time](./docs/assets/demo-sidebyside.gif)
 
 ---
 
