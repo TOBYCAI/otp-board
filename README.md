@@ -8,6 +8,8 @@
 ![CI](https://img.shields.io/github/actions/workflow/status/TOBYCAI/otp-board/ci.yml?branch=main&label=ci&style=flat-square)
 ![type](https://img.shields.io/badge/type-android--node-4d6bfe?style=flat-square)
 
+![OTP Board 演示:手机收到短信,看板实时同步](./docs/assets/demo-sidebyside.gif)
+
 一款开源的**验证码（OTP）自动转发 + 网页看板**项目。Android 客户端在本地监听短信、
 系统通知（微信 / WhatsApp / 邮件等），提取验证码后通过 HTTPS 推送到自建的 Node.js 看板，
 在浏览器中集中查看、管理与导出。
