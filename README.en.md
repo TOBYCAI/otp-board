@@ -125,6 +125,10 @@ No Android Studio, no build: go to [Releases](https://github.com/TOBYCAI/otp-boa
 
 > 🤖 **Android 16 compatibility (v3.2.1+)**: the app now declares `ACCESS_NETWORK_STATE` in its manifest. Android 16 (API 36+) mandates this permission for `JobScheduler` jobs with a network constraint, so on older builds the forward job is rejected on Android 16 devices. Upgrade to v3.2.1 or later to forward normally.
 
+| App icon | Home screen |
+| :---: | :---: |
+| ![App icon](./docs/assets/app-icon-home.png) | ![Home screen](./docs/assets/app-home.png) |
+
 **The Android source is open too**: the full `android/` project (Kotlin + Gradle) ships with the repo, so you can modify it and rebuild yourself. Clone, change the code, then build:
 
 ```bash
