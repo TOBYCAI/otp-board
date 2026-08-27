@@ -120,6 +120,8 @@ curl -fsSL https://raw.githubusercontent.com/TOBYCAI/otp-board/main/server/insta
 >
 > APK 由 GitHub Actions 在打 tag 时自动构建并用**生产 keystore 签名**（CN=TOBYCAI），可直接安装使用。
 
+> 🤖 **Android 16 兼容（v3.2.1+）**：已在 `AndroidManifest.xml` 声明 `ACCESS_NETWORK_STATE`。Android 16（API 36+）对带网络约束的 `JobScheduler` 任务强制要求该权限，旧版本安装在 Android 16 设备上时转发 Job 会被系统拒绝；升级到 v3.2.1 及以上即可正常转发。
+
 **安卓源码也随仓库一并开源**：完整 `android/` 工程（Kotlin + Gradle）就在仓库里，可以自行修改、重新构建。克隆仓库后改代码再编译：
 
 ```bash

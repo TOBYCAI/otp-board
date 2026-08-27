@@ -11,8 +11,8 @@ android {
         applicationId = "com.example.otpforward"
         minSdk = 29
         targetSdk = 35
-        versionCode = 5
-        versionName = "3.1.1"
+        versionCode = 6
+        versionName = "3.2.1"
     }
 
     buildFeatures {
